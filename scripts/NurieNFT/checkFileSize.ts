@@ -1,5 +1,5 @@
 import { ethers } from "hardhat";
-import fs from "fs";
+import { readFileSync } from "fs";
 
 async function main() {
   const factory = await ethers.getContractFactory("NurieNFT");
@@ -7,14 +7,19 @@ async function main() {
   await contract.deployed();
 
   console.log("NurieNFT deployed to:", contract.address);
-
-  const svgBody = fs.readFileSync("./input/108_body.svg", "utf-8");
+  const svgBody = readFileSync("./input/108_body.svg");
   console.log("length", svgBody.length);
   const svgBody1 = svgBody.slice(0, 14000);
   const buf = Buffer.from(svgBody1);
   console.log("buf.length", buf.length);
 
-  let tx = await contract.addNurie("First", "", "", [""]);
+  let tx = await contract.addNurie(
+    "First",
+    Buffer.from(""),
+    Buffer.from(""),
+    [""],
+    [""]
+  );
   console.log("addNurie", tx.hash);
   await tx.wait();
   tx = await contract.appendSvgBody(0, svgBody1);
