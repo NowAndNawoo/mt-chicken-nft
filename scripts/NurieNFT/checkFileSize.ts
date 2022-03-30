@@ -8,7 +8,7 @@ async function main() {
 
   console.log("NurieNFT deployed to:", contract.address);
 
-  const svgBody = fs.readFileSync("./scripts/NurieNFT/108_body.svg", "utf-8");
+  const svgBody = fs.readFileSync("./input/108_body.svg", "utf-8");
   console.log("length", svgBody.length);
   const svgBody1 = svgBody.slice(0, 14000);
   const buf = Buffer.from(svgBody1);
@@ -18,11 +18,11 @@ async function main() {
   console.log("addNurie", tx.hash);
   await tx.wait();
   tx = await contract.appendSvgBody(0, svgBody1);
-  // 14000 OK
   // 15000 Transaction gas limit is 30041880 and exceeds block gas limit of 30000000
+  // 14000 OK
   console.log("appendSvgBody 1", tx.hash);
   console.log(tx.gasLimit);
-  // 14000 gasLimit: BigNumber { value: "29973912" }
+  // 14000 gasLimit: BigNumber { value: "29973912" },
   // 12000 gasLimit: BigNumber { value: "29837848" },
   let receipt = await tx.wait();
   // 14000 gasUsed: BigNumber { value: "9987657" },
