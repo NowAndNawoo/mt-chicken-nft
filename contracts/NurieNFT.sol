@@ -8,9 +8,10 @@ import "@openzeppelin/contracts/utils/Base64.sol";
 
 struct Nurie {
     string title;
-    string svgHead;
-    string svgBody;
-    string[] colorNames;
+    bytes svgHead;
+    bytes svgBody;
+    string[] areaNames; // ex. "Face", "Eyes"...
+    string[] classNames; // ex. "cls-1", "cls-2"...
     uint256 mintCount;
 }
 
@@ -39,8 +40,8 @@ contract NurieNFT is ERC721Enumerable, Ownable {
         require(nurieIndex < nurieItems.length, "nurieIndex out of range");
         Nurie storage nurie = nurieItems[nurieIndex];
         require(
-            nurie.colorNames.length == colors.length,
-            "colors.length is invalid"
+            colors.length == nurie.areaNames.length,
+            "colors.length is not equal to areaNames.length"
         );
 
         uint256 _tokenId = nextTokenId;
@@ -52,20 +53,27 @@ contract NurieNFT is ERC721Enumerable, Ownable {
 
     function addNurie(
         string calldata title,
-        string calldata svgHead,
-        string calldata svgBody,
-        string[] calldata colorNames
+        bytes calldata svgHead,
+        bytes calldata svgBody,
+        string[] calldata areaNames,
+        string[] calldata classNames
     ) external onlyOwner {
-        nurieItems.push(Nurie(title, svgHead, svgBody, colorNames, 0));
+        require(
+            areaNames.length == classNames.length,
+            "areaNames.length is not equal to classNames.length"
+        );
+        nurieItems.push(
+            Nurie(title, svgHead, svgBody, areaNames, classNames, 0)
+        );
     }
 
-    function appendSvgBody(uint256 nurieIndex, string calldata svg)
+    function appendSvgBody(uint256 nurieIndex, bytes calldata svg)
         external
         onlyOwner
     {
         require(nurieIndex < nurieItems.length, "nurieIndex out of range");
         Nurie storage nurie = nurieItems[nurieIndex];
-        nurie.svgBody = string(abi.encodePacked(nurie.svgBody, svg));
+        nurie.svgBody = abi.encodePacked(nurie.svgBody, svg);
     }
 
     function clearSvgBody(uint256 nurieIndex) external onlyOwner {
@@ -102,7 +110,9 @@ contract NurieNFT is ERC721Enumerable, Ownable {
 
         return
             abi.encodePacked(
-                '{"name": "NurieNFT #',
+                '{"name": "NurieNFT (',
+                nurieItems[nurieIndex].title,
+                ") #",
                 tokenId.toString(),
                 '", "description": "(todo) description", "image": "data:image/svg+xml;base64,',
                 Base64.encode(bytes(getSvg(nurieIndex, colors))),
@@ -115,19 +125,18 @@ contract NurieNFT is ERC721Enumerable, Ownable {
         view
         returns (string memory)
     {
-        string storage svgHead = nurieItems[nurieIndex].svgHead;
-        string storage svgBody = nurieItems[nurieIndex].svgBody;
+        Nurie storage nurie = nurieItems[nurieIndex];
         bytes memory styles = "";
         for (uint256 i = 0; i < colors.length; i++) {
             styles = abi.encodePacked(
                 styles,
-                ".cls-",
-                (i + 1).toString(),
+                ".",
+                nurie.classNames[i],
                 "{fill:#",
                 colors[i],
                 ";}"
             );
         }
-        return string(abi.encodePacked(svgHead, styles, svgBody, "</svg>"));
+        return string(abi.encodePacked(nurie.svgHead, styles, nurie.svgBody));
     }
 }
