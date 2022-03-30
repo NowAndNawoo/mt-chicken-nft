@@ -9,21 +9,18 @@ async function main() {
   console.log("NurieNFT deployed to:", contract.address);
 
   // addNurie & appendSvgBody
-  const svgHead = readFileSync("./input/108_head.svg");
-  const svgBody = readFileSync("./input/108_body.svg");
+  const svgHead = readFileSync("./data/sample_head.svg");
+  const svgBody = readFileSync("./data/sample_body.svg");
   const splitSize = 12000;
   const splitCount = Math.ceil(svgBody.length / splitSize);
   console.log("splitCount", splitCount);
   const classes = [
     // ユーザーが色を変更できるクラス名とその名称
     ["cls-1", "Background"],
-    ["cls-2", "Face1"],
-    ["cls-3", "Face2"],
-    ["cls-4", "Body"],
-    ["cls-5", "Hand"],
-    ["cls-6", "Mouth"],
+    ["cls-3", "Face"],
+    ["cls-5", "RightEye"],
     ["cls-7", "LeftEye"],
-    ["cls-8", "RightEye"],
+    ["cls-9", "Mouth"],
   ];
   const areaNames = classes.map(([_, a]) => a);
   const classNames = classes.map(([c, _]) => c);
@@ -47,14 +44,11 @@ async function main() {
 
   // mint
   const colors = [
-    "ff00ff", // Background
-    "808080", // Face1
-    "002020", // ...
-    "0040ff",
-    "8060ff",
-    "00ff00",
-    "008000",
-    "00a0c0",
+    "ffc0ff", // Background
+    "c0c0c0", // Face
+    "003030", // RightEye
+    "600000", // LeftEye
+    "005000", // Mouth
   ];
   tx = await contract.mint(0, colors);
   console.log("mint", tx.hash);
@@ -69,7 +63,7 @@ async function main() {
     "base64"
   ).toString();
   console.log(svg);
-  writeFileSync(`./output/nft_${tokenId}.svg`, svg);
+  writeFileSync(`./output/sample_${tokenId}.svg`, svg);
 }
 
 main().catch((error) => {

@@ -7,10 +7,9 @@ async function main() {
   await contract.deployed();
 
   console.log("NurieNFT deployed to:", contract.address);
-  const svgBody = readFileSync("./input/108_body.svg");
+  const svgBody = readFileSync("./data/26kb.svg");
   console.log("length", svgBody.length);
-  const svgBody1 = svgBody.slice(0, 14000);
-  const buf = Buffer.from(svgBody1);
+  const buf = svgBody.slice(0, 14000);
   console.log("buf.length", buf.length);
 
   let tx = await contract.addNurie(
@@ -22,7 +21,7 @@ async function main() {
   );
   console.log("addNurie", tx.hash);
   await tx.wait();
-  tx = await contract.appendSvgBody(0, svgBody1);
+  tx = await contract.appendSvgBody(0, buf);
   // 15000 Transaction gas limit is 30041880 and exceeds block gas limit of 30000000
   // 14000 OK
   console.log("appendSvgBody 1", tx.hash);
