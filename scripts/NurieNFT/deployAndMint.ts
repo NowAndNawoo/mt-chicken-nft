@@ -8,49 +8,39 @@ async function main() {
   await contract.deployed();
   console.log("NurieNFT deployed to:", contract.address);
 
-  // addNurie & appendSvgBody
+  // setSvgHead & appendSvgBody
   const svgHead = readFileSync("./data/sample_head.svg");
   const svgBody = readFileSync("./data/sample_body.svg");
   const splitSize = 12000;
   const splitCount = Math.ceil(svgBody.length / splitSize);
   console.log("splitCount", splitCount);
-  const classes = [
-    // ユーザーが色を変更できるクラス名とその名称
-    ["cls-1", "Background"],
-    ["cls-3", "Face"],
-    ["cls-5", "RightEye"],
-    ["cls-7", "LeftEye"],
-    ["cls-9", "Mouth"],
-  ];
-  const areaNames = classes.map(([_, a]) => a);
-  const classNames = classes.map(([c, _]) => c);
 
-  let tx = await contract.addNurie(
-    "First",
-    svgHead,
-    Buffer.from(""),
-    areaNames,
-    classNames
-  );
-  console.log("addNurie", tx.hash);
+  let tx = await contract.setSvgHead(svgHead);
+  console.log("setSvgHead", tx.hash);
   await tx.wait();
   for (let i = 0; i < splitCount; i++) {
     const buf = svgBody.slice(i * splitSize, (i + 1) * splitSize);
-    console.log("i=", i, buf.length);
-    tx = await contract.appendSvgBody(0, buf);
-    console.log("appendSvgBody", i, tx.hash);
+    tx = await contract.appendSvgBody(buf);
+    console.log("appendSvgBody", i, buf.length, tx.hash);
     await tx.wait();
   }
 
   // mint
-  const colors = [
-    "ffc0ff", // Background
-    "c0c0c0", // Face
-    "003030", // RightEye
-    "600000", // LeftEye
-    "005000", // Mouth
-  ];
-  tx = await contract.mint(0, colors);
+  tx = await contract.mint(
+    [
+      "#ff00ff",
+      "#00ff00",
+      "#ff00ff",
+      "#00ff00",
+      "#ff00ff",
+      "#00ff00",
+      "#ff00ff",
+      "#00ff00",
+      "#ff00ff",
+      "#00ff00",
+    ],
+    [true, true, false, false]
+  );
   console.log("mint", tx.hash);
   await tx.wait();
 
@@ -58,6 +48,7 @@ async function main() {
   const tokenId = 1;
   const uri = await contract.tokenURI(tokenId);
   const json = Buffer.from(uri.split(",")[1], "base64").toString();
+  console.log(uri);
   const svg = Buffer.from(
     JSON.parse(json).image.split(",")[1],
     "base64"
