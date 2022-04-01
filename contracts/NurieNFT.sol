@@ -6,79 +6,50 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/Base64.sol";
 
-struct Nurie {
-    string title;
-    bytes svgHead;
-    bytes svgBody;
-    string[] areaNames; // ex. "Face", "Eyes"...
-    string[] classNames; // ex. "cls-1", "cls-2"...
-    uint256 mintCount;
+struct PaintInfo {
+    string[10] colors;
+    bool[4] flags;
 }
 
-struct ColorInfo {
-    uint256 nurieIndex;
-    string[] colors;
+struct Traits {
+    uint8 mountPower;
+    // ...
 }
 
 contract NurieNFT is ERC721Enumerable, Ownable {
     using Strings for uint256;
 
+    bytes private svgHead;
+    bytes private svgBody;
+    mapping(uint256 => PaintInfo) private paintData; // tokenId => PaintInfo
+    mapping(uint256 => Traits) private traitsData; // tokenId => Traits;
+
     uint256 public nextTokenId = 1;
 
-    Nurie[] public nurieItems;
-    mapping(uint256 => ColorInfo) public colorInfoItems; // tokenId => ColorInfo
-
-    constructor() ERC721("NurieNFT", "NURIE") {
-        //
-    }
+    constructor() ERC721("NurieNFT", "NURIE") {}
 
     function exists(uint256 tokenId) public view returns (bool) {
         return _exists(tokenId);
     }
 
-    function mint(uint256 nurieIndex, string[] calldata colors) external {
-        require(nurieIndex < nurieItems.length, "nurieIndex out of range");
-        Nurie storage nurie = nurieItems[nurieIndex];
-        require(
-            colors.length == nurie.areaNames.length,
-            "colors.length is not equal to areaNames.length"
-        );
-
+    function mint(string[10] calldata colors, bool[4] calldata flags) external {
         uint256 _tokenId = nextTokenId;
         nextTokenId++;
-        colorInfoItems[_tokenId] = ColorInfo(nurieIndex, colors);
-        nurieItems[nurieIndex].mintCount++;
+        paintData[_tokenId] = PaintInfo(colors, flags);
+        // TODO: set traitsData
         _safeMint(_msgSender(), _tokenId);
     }
 
-    function addNurie(
-        string calldata title,
-        bytes calldata svgHead,
-        bytes calldata svgBody,
-        string[] calldata areaNames,
-        string[] calldata classNames
-    ) external onlyOwner {
-        require(
-            areaNames.length == classNames.length,
-            "areaNames.length is not equal to classNames.length"
-        );
-        nurieItems.push(
-            Nurie(title, svgHead, svgBody, areaNames, classNames, 0)
-        );
+    function setSvgHead(bytes calldata head) external onlyOwner {
+        svgHead = head;
     }
 
-    function appendSvgBody(uint256 nurieIndex, bytes calldata svg)
-        external
-        onlyOwner
-    {
-        require(nurieIndex < nurieItems.length, "nurieIndex out of range");
-        Nurie storage nurie = nurieItems[nurieIndex];
-        nurie.svgBody = abi.encodePacked(nurie.svgBody, svg);
+    function appendSvgBody(bytes calldata body) external onlyOwner {
+        svgBody = abi.encodePacked(svgBody, body);
     }
 
-    function clearSvgBody(uint256 nurieIndex) external onlyOwner {
-        require(nurieIndex < nurieItems.length, "nurieIndex out of range");
-        nurieItems[nurieIndex].svgBody = "";
+    function clearSvgBody() external onlyOwner {
+        svgBody = "";
     }
 
     function tokenURI(uint256 tokenId)
@@ -87,11 +58,7 @@ contract NurieNFT is ERC721Enumerable, Ownable {
         override
         returns (string memory)
     {
-        require(
-            _exists(tokenId),
-            "ERC721Metadata: URI query for nonexistent token"
-        );
-
+        require(_exists(tokenId), "URI query for nonexistent token");
         return
             string(
                 abi.encodePacked(
@@ -102,41 +69,65 @@ contract NurieNFT is ERC721Enumerable, Ownable {
     }
 
     function getMetadata(uint256 tokenId) private view returns (bytes memory) {
-        ColorInfo storage colorInfo = colorInfoItems[tokenId];
-        uint256 nurieIndex = colorInfo.nurieIndex;
-        string[] memory colors = colorInfo.colors;
-
-        // TODO: attributes
-
+        // TODO: traitsDataからattributesを作成
         return
+            // TODO: name,descriptionは仮
             abi.encodePacked(
-                '{"name": "NurieNFT (',
-                nurieItems[nurieIndex].title,
-                ") #",
+                '{"name": "NurieNFT #',
                 tokenId.toString(),
                 '", "description": "(todo) description", "image": "data:image/svg+xml;base64,',
-                Base64.encode(bytes(getSvg(nurieIndex, colors))),
+                Base64.encode(getSvg(paintData[tokenId])),
                 '"}'
             );
     }
 
-    function getSvg(uint256 nurieIndex, string[] memory colors)
-        public
+    function getSvg(PaintInfo memory paintInfo)
+        private
         view
-        returns (string memory)
+        returns (bytes memory)
     {
-        Nurie storage nurie = nurieItems[nurieIndex];
-        bytes memory styles = "";
-        for (uint256 i = 0; i < colors.length; i++) {
-            styles = abi.encodePacked(
-                styles,
-                ".",
-                nurie.classNames[i],
-                "{fill:#",
-                colors[i],
-                ";}"
-            );
-        }
-        return string(abi.encodePacked(nurie.svgHead, styles, nurie.svgBody));
+        string[10] memory colors = paintInfo.colors;
+        bool[4] memory flags = paintInfo.flags;
+
+        // 落書きのon/off切り替え (fill="transparent" にするか display:none を設定)
+        string memory faceMark1 = flags[0] ? "#804020" : "transparent"; // TODO:色は仮
+        string memory faceMark2 = flags[0] ? "#304020" : "transparent";
+        string memory faceMark3 = flags[0] ? "#404020" : "transparent";
+        string memory faceMark4 = flags[0] ? "#204020" : "transparent";
+
+        bytes memory styles = abi.encodePacked(
+            ".cls-1{fill:", // TODO: クラス名は仮
+            colors[0],
+            "}",
+            ".cls-2{fill:",
+            colors[1],
+            "}",
+            ".cls-3{fill:",
+            colors[2],
+            "}",
+            ".cls-4{fill:",
+            colors[3],
+            "}",
+            ".cls-5{fill:",
+            colors[4],
+            "}"
+            // ...
+        );
+        styles = abi.encodePacked(
+            styles,
+            ".cls-11{fill:",
+            faceMark1,
+            "}",
+            ".cls-12{fill:",
+            faceMark2,
+            "}",
+            ".cls-13{fill:",
+            faceMark3,
+            "}",
+            ".cls-14{fill:",
+            faceMark4,
+            "}"
+        );
+        return abi.encodePacked(svgHead, styles, svgBody);
     }
 }
