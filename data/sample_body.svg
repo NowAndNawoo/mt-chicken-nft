@@ -1,4 +1,6 @@
+      <!--ユーザーが変更できない色-->
       .cls-2{fill:#003eff;}.cls-4{fill:#e5e49e;}.cls-6{fill:#df183e;}.cls-8{fill:#fb0;}.cls-10{fill:#ff9700;}
+      .cls-11{fill:red}.cls-12{fill:blue}.cls-13{fill:green}
     </style>
   </defs>
   <rect width="750" height="750" class="cls-1"/>
@@ -13,4 +15,7 @@
   <circle cx="100" cy="400" r="20" class="cls-6"/>
   <circle cx="100" cy="450" r="20" class="cls-8"/>
   <circle cx="100" cy="500" r="20" class="cls-10"/>
+  <circle cx="150" cy="300" r="20" class="cls-11 dsp-1"/>
+  <circle cx="150" cy="350" r="20" class="cls-12 dsp-2"/>
+  <circle cx="150" cy="400" r="20" class="cls-13 dsp-3"/>
 </svg>
