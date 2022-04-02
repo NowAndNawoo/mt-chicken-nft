@@ -1,5 +1,5 @@
       <!--ユーザーが変更できない色-->
-      .cls-2{fill:#003eff;}.cls-4{fill:#e5e49e;}.cls-6{fill:#df183e;}.cls-8{fill:#fb0;}.cls-10{fill:#ff9700;}
+      .cls-2{fill:#003eff}.cls-4{fill:#e5e49e}.cls-6{fill:#df183e}.cls-8{fill:#fb0}.cls-9{fill:#dc0e11}.cls-10{fill:#ff9700}
       .cls-11{fill:red}.cls-12{fill:blue}.cls-13{fill:green}
     </style>
   </defs>

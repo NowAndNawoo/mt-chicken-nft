@@ -26,7 +26,7 @@ async function main() {
   }
   tx = await contract.setClassNames({
     head: "cls-1",
-    body: "cls-2",
+    body: "cls-3",
     eye: "cls-5",
     tail: "cls-7",
     scar: "dsp-1",

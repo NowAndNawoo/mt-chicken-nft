@@ -2,11 +2,11 @@
   <defs>
     <style>
       <!--ユーザーが変更できる色-->
-      .cls-1{fill:#ffffff;}.cls-3{fill:#f0f000;}.cls-5{fill:#1a1a1a;}.cls-7{fill:#007205;}
+      .cls-1{fill:#ffffff}.cls-3{fill:#f0f000}.cls-5{fill:#1a1a1a}.cls-7{fill:#007205}
       <!--表示、非表示の切り替え-->
-      .dsp-1{display:none;}.dsp-2{display:none;}.dsp-3{display:none;}
+      .dsp-1{display:none}.dsp-2{display:none}.dsp-3{display:none}
       <!--ユーザーが変更できない色-->
-      .cls-2{fill:#003eff;}.cls-4{fill:#e5e49e;}.cls-6{fill:#df183e;}.cls-8{fill:#fb0;}.cls-10{fill:#ff9700;}
+      .cls-2{fill:#003eff}.cls-4{fill:#e5e49e}.cls-6{fill:#df183e}.cls-8{fill:#fb0}.cls-9{fill:#dc0e11}.cls-10{fill:#ff9700}
       .cls-11{fill:red}.cls-12{fill:blue}.cls-13{fill:green}
     </style>
   </defs>
