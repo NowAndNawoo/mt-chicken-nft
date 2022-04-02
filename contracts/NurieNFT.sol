@@ -6,9 +6,28 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/Base64.sol";
 
-struct PaintInfo {
-    string[10] colors;
-    bool[4] flags;
+struct ClassNames {
+    string head;
+    string body;
+    string eye;
+    string tail;
+    // ...
+    string scar;
+    string moustache;
+    string beard;
+    // ...
+}
+
+struct Colors {
+    uint24 head;
+    uint24 body;
+    uint24 eye;
+    uint24 tail;
+    // ...
+    bool scar;
+    bool moustache;
+    bool beard;
+    // ...
 }
 
 struct Traits {
@@ -21,8 +40,9 @@ contract NurieNFT is ERC721Enumerable, Ownable {
 
     bytes private svgHead;
     bytes private svgBody;
-    mapping(uint256 => PaintInfo) private paintData; // tokenId => PaintInfo
-    mapping(uint256 => Traits) private traitsData; // tokenId => Traits;
+    ClassNames private classNames;
+    mapping(uint256 => Colors) private colorsData; // tokenId => Colors
+    mapping(uint256 => Traits) private traitsData; // tokenId => Traits
 
     uint256 public nextTokenId = 1;
 
@@ -32,10 +52,10 @@ contract NurieNFT is ERC721Enumerable, Ownable {
         return _exists(tokenId);
     }
 
-    function mint(string[10] calldata colors, bool[4] calldata flags) external {
+    function mint(Colors calldata colors) external {
         uint256 _tokenId = nextTokenId;
         nextTokenId++;
-        paintData[_tokenId] = PaintInfo(colors, flags);
+        colorsData[_tokenId] = colors;
         // TODO: set traitsData
         _safeMint(_msgSender(), _tokenId);
     }
@@ -50,6 +70,10 @@ contract NurieNFT is ERC721Enumerable, Ownable {
 
     function clearSvgBody() external onlyOwner {
         svgBody = "";
+    }
+
+    function setClassNames(ClassNames calldata _classNames) external onlyOwner {
+        classNames = _classNames;
     }
 
     function tokenURI(uint256 tokenId)
@@ -76,58 +100,57 @@ contract NurieNFT is ERC721Enumerable, Ownable {
                 '{"name": "NurieNFT #',
                 tokenId.toString(),
                 '", "description": "(todo) description", "image": "data:image/svg+xml;base64,',
-                Base64.encode(getSvg(paintData[tokenId])),
+                Base64.encode(getSvg(colorsData[tokenId])),
                 '"}'
             );
     }
 
-    function getSvg(PaintInfo memory paintInfo)
-        private
-        view
-        returns (bytes memory)
-    {
-        string[10] memory colors = paintInfo.colors;
-        bool[4] memory flags = paintInfo.flags;
-
-        // 落書きのon/off切り替え (fill="transparent" にするか display:none を設定)
-        string memory faceMark1 = flags[0] ? "#804020" : "transparent"; // TODO:色は仮
-        string memory faceMark2 = flags[0] ? "#304020" : "transparent";
-        string memory faceMark3 = flags[0] ? "#404020" : "transparent";
-        string memory faceMark4 = flags[0] ? "#204020" : "transparent";
-
+    function getSvg(Colors memory colors) private view returns (bytes memory) {
         bytes memory styles = abi.encodePacked(
-            ".cls-1{fill:", // TODO: クラス名は仮
-            colors[0],
+            ".",
+            classNames.head,
+            "{fill:#",
+            uint256(colors.head).toHexString(3),
             "}",
-            ".cls-2{fill:",
-            colors[1],
+            ".",
+            classNames.body,
+            "{fill:#",
+            uint256(colors.body).toHexString(3),
             "}",
-            ".cls-3{fill:",
-            colors[2],
+            ".",
+            classNames.eye,
+            "{fill:#",
+            uint256(colors.eye).toHexString(3),
             "}",
-            ".cls-4{fill:",
-            colors[3],
-            "}",
-            ".cls-5{fill:",
-            colors[4],
+            ".",
+            classNames.tail,
+            "{fill:#",
+            uint256(colors.tail).toHexString(3),
             "}"
             // ...
         );
-        styles = abi.encodePacked(
-            styles,
-            ".cls-11{fill:",
-            faceMark1,
-            "}",
-            ".cls-12{fill:",
-            faceMark2,
-            "}",
-            ".cls-13{fill:",
-            faceMark3,
-            "}",
-            ".cls-14{fill:",
-            faceMark4,
-            "}"
-        );
+        if (!colors.scar)
+            styles = abi.encodePacked(
+                styles,
+                ".",
+                classNames.scar,
+                "{display: none}"
+            );
+        if (!colors.moustache)
+            styles = abi.encodePacked(
+                styles,
+                ".",
+                classNames.moustache,
+                "{display: none}"
+            );
+        if (!colors.beard)
+            styles = abi.encodePacked(
+                styles,
+                ".",
+                classNames.beard,
+                "{display: none}"
+            );
+        // ...
         return abi.encodePacked(svgHead, styles, svgBody);
     }
 }
