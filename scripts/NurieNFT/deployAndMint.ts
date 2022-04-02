@@ -24,23 +24,29 @@ async function main() {
     console.log("appendSvgBody", i, buf.length, tx.hash);
     await tx.wait();
   }
+  tx = await contract.setClassNames({
+    head: "cls-1",
+    body: "cls-2",
+    eye: "cls-5",
+    tail: "cls-7",
+    scar: "dsp-1",
+    moustache: "dsp-2",
+    beard: "dsp-3",
+  });
+  console.log("setClassNames", tx.hash);
+  await tx.wait();
 
   // mint
-  tx = await contract.mint(
-    [
-      "#ff00ff",
-      "#00ff00",
-      "#ff00ff",
-      "#00ff00",
-      "#ff00ff",
-      "#00ff00",
-      "#ff00ff",
-      "#00ff00",
-      "#ff00ff",
-      "#00ff00",
-    ],
-    [true, true, false, false]
-  );
+  const toHex = (s: string) => parseInt(s, 16);
+  tx = await contract.mint({
+    head: toHex("ff00ff"),
+    body: toHex("00ffff"),
+    eye: toHex("ffff00"),
+    tail: toHex("abcdef"),
+    scar: false,
+    moustache: true,
+    beard: false,
+  });
   console.log("mint", tx.hash);
   await tx.wait();
 
