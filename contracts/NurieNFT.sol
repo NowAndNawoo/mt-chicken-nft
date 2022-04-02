@@ -5,6 +5,7 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/Base64.sol";
+import "hardhat/console.sol";
 
 struct ClassNames {
     string head;
@@ -37,6 +38,7 @@ struct Traits {
 
 contract NurieNFT is ERC721Enumerable, Ownable {
     using Strings for uint256;
+    bytes16 private constant HEX_SYMBOLS = "0123456789abcdef";
 
     bytes private svgHead;
     bytes private svgBody;
@@ -105,27 +107,35 @@ contract NurieNFT is ERC721Enumerable, Ownable {
             );
     }
 
+    function toColorHex(uint24 value) private pure returns (string memory) {
+        bytes memory buffer = new bytes(6);
+        for (uint256 i = 0; i < 6; i++) {
+            buffer[i] = HEX_SYMBOLS[(value >> (4 * (5 - i))) & 0xf];
+        }
+        return string(buffer);
+    }
+
     function getSvg(Colors memory colors) private view returns (bytes memory) {
         bytes memory styles = abi.encodePacked(
             ".",
             classNames.head,
             "{fill:#",
-            uint256(colors.head).toHexString(3),
+            toColorHex(colors.head),
             "}",
             ".",
             classNames.body,
             "{fill:#",
-            uint256(colors.body).toHexString(3),
+            toColorHex(colors.body),
             "}",
             ".",
             classNames.eye,
             "{fill:#",
-            uint256(colors.eye).toHexString(3),
+            toColorHex(colors.eye),
             "}",
             ".",
             classNames.tail,
             "{fill:#",
-            uint256(colors.tail).toHexString(3),
+            toColorHex(colors.tail),
             "}"
             // ...
         );
