@@ -36,6 +36,14 @@ contract NurieNFT is ERC721Enumerable, Ownable {
     }
 
     function mint(uint24[] calldata colors, bool[] calldata flags) external {
+        require(
+            colors.length == colorClassNames.length,
+            "colors.length is invalid"
+        );
+        require(
+            flags.length == flagClassNames.length,
+            "flags.length is invalid"
+        );
         uint256 _tokenId = nextTokenId;
         nextTokenId++;
         paintsData[_tokenId] = PaintInfo(colors, flags);
