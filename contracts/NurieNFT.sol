@@ -57,8 +57,8 @@ contract NurieNFT is ERC721Enumerable, Ownable {
     }
 
     function setClassNames(
-        string[] calldata _colorClassNames,
-        string[] calldata _flagClassNames
+        string[] memory _colorClassNames,
+        string[] memory _flagClassNames
     ) external onlyOwner {
         colorClassNames = _colorClassNames;
         flagClassNames = _flagClassNames;
