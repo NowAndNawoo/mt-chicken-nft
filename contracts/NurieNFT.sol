@@ -7,28 +7,9 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/Base64.sol";
 import "hardhat/console.sol";
 
-struct ClassNames {
-    string head;
-    string body;
-    string eye;
-    string tail;
-    // ...
-    string scar;
-    string moustache;
-    string beard;
-    // ...
-}
-
-struct Colors {
-    uint24 head;
-    uint24 body;
-    uint24 eye;
-    uint24 tail;
-    // ...
-    bool scar;
-    bool moustache;
-    bool beard;
-    // ...
+struct PaintInfo {
+    uint24[] colors;
+    bool[] flags;
 }
 
 struct Traits {
@@ -42,8 +23,9 @@ contract NurieNFT is ERC721Enumerable, Ownable {
 
     bytes private svgHead;
     bytes private svgBody;
-    ClassNames private classNames;
-    mapping(uint256 => Colors) private colorsData; // tokenId => Colors
+    string[] private colorClassNames;
+    string[] private flagClassNames;
+    mapping(uint256 => PaintInfo) private paintsData; // tokenId => PaintInfo
     mapping(uint256 => Traits) private traitsData; // tokenId => Traits
 
     uint256 public nextTokenId = 1;
@@ -54,10 +36,10 @@ contract NurieNFT is ERC721Enumerable, Ownable {
         return _exists(tokenId);
     }
 
-    function mint(Colors calldata colors) external {
+    function mint(uint24[] calldata colors, bool[] calldata flags) external {
         uint256 _tokenId = nextTokenId;
         nextTokenId++;
-        colorsData[_tokenId] = colors;
+        paintsData[_tokenId] = PaintInfo(colors, flags);
         // TODO: set traitsData
         _safeMint(_msgSender(), _tokenId);
     }
@@ -74,8 +56,12 @@ contract NurieNFT is ERC721Enumerable, Ownable {
         svgBody = "";
     }
 
-    function setClassNames(ClassNames calldata _classNames) external onlyOwner {
-        classNames = _classNames;
+    function setClassNames(
+        string[] calldata _colorClassNames,
+        string[] calldata _flagClassNames
+    ) external onlyOwner {
+        colorClassNames = _colorClassNames;
+        flagClassNames = _flagClassNames;
     }
 
     function tokenURI(uint256 tokenId)
@@ -102,7 +88,7 @@ contract NurieNFT is ERC721Enumerable, Ownable {
                 '{"name": "NurieNFT #',
                 tokenId.toString(),
                 '", "description": "(todo) description", "image": "data:image/svg+xml;base64,',
-                Base64.encode(getSvg(colorsData[tokenId])),
+                Base64.encode(getSvg(paintsData[tokenId])),
                 '"}'
             );
     }
@@ -115,52 +101,31 @@ contract NurieNFT is ERC721Enumerable, Ownable {
         return string(buffer);
     }
 
-    function getSvg(Colors memory colors) private view returns (bytes memory) {
-        bytes memory styles = abi.encodePacked(
-            ".",
-            classNames.head,
-            "{fill:#",
-            toColorHex(colors.head),
-            "}",
-            ".",
-            classNames.body,
-            "{fill:#",
-            toColorHex(colors.body),
-            "}",
-            ".",
-            classNames.eye,
-            "{fill:#",
-            toColorHex(colors.eye),
-            "}",
-            ".",
-            classNames.tail,
-            "{fill:#",
-            toColorHex(colors.tail),
-            "}"
-            // ...
-        );
-        if (!colors.scar)
+    function getSvg(PaintInfo memory paintInfo)
+        private
+        view
+        returns (bytes memory)
+    {
+        bytes memory styles = "";
+        for (uint256 i = 0; i < paintInfo.colors.length; i++) {
             styles = abi.encodePacked(
                 styles,
                 ".",
-                classNames.scar,
-                "{display: none}"
+                colorClassNames[i],
+                "{fill:#",
+                toColorHex(paintInfo.colors[i]),
+                ";}"
             );
-        if (!colors.moustache)
-            styles = abi.encodePacked(
-                styles,
-                ".",
-                classNames.moustache,
-                "{display: none}"
-            );
-        if (!colors.beard)
-            styles = abi.encodePacked(
-                styles,
-                ".",
-                classNames.beard,
-                "{display: none}"
-            );
-        // ...
+        }
+        for (uint256 i = 0; i < paintInfo.flags.length; i++) {
+            if (!paintInfo.flags[i])
+                styles = abi.encodePacked(
+                    styles,
+                    ".",
+                    flagClassNames[i],
+                    "{display:none;}"
+                );
+        }
         return abi.encodePacked(svgHead, styles, svgBody);
     }
 }
