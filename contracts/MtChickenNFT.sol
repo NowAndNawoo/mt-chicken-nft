@@ -16,7 +16,7 @@ struct Traits {
     // ...
 }
 
-contract NurieNFT is ERC721Enumerable, Ownable {
+contract MtChickenNFT is ERC721Enumerable, Ownable {
     using Strings for uint256;
     bytes16 private constant HEX_SYMBOLS = "0123456789abcdef";
 
@@ -29,7 +29,7 @@ contract NurieNFT is ERC721Enumerable, Ownable {
 
     uint256 public nextTokenId = 1;
 
-    constructor() ERC721("NurieNFT", "NURIE") {}
+    constructor() ERC721("MtChicken", "MTCHICKEN") {}
 
     function exists(uint256 tokenId) public view returns (bool) {
         return _exists(tokenId);
@@ -89,12 +89,15 @@ contract NurieNFT is ERC721Enumerable, Ownable {
 
     function getMetadata(uint256 tokenId) private view returns (bytes memory) {
         // TODO: traitsDataからattributesを作成
+        bytes
+            memory description = 'Mt. Chicken is a NFT collection on the Polygon chain. You can \\"paint\\" Mt. Chicken through the website and mint it for only gas fee. No mint number limit, No secondary sale fee, No license(=CC0).';
         return
-            // TODO: name,descriptionは仮
             abi.encodePacked(
-                '{"name": "NurieNFT #',
+                '{"name": "MtChicken #',
                 tokenId.toString(),
-                '", "description": "(todo) description", "image": "data:image/svg+xml;base64,',
+                '", "description": "',
+                description,
+                '", "image": "data:image/svg+xml;base64,',
                 Base64.encode(getSvg(paintsData[tokenId])),
                 '"}'
             );
