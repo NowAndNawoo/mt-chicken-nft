@@ -3,10 +3,10 @@ import { readFileSync, writeFileSync } from "fs";
 
 async function main() {
   // deploy
-  const factory = await ethers.getContractFactory("NurieNFT");
+  const factory = await ethers.getContractFactory("MtChickenNFT");
   const contract = await factory.deploy();
   await contract.deployed();
-  console.log("NurieNFT deployed to:", contract.address);
+  console.log("MtChickenNFT deployed to:", contract.address);
 
   // setSvgHead & appendSvgBody
   const svgHead = readFileSync("./data/sample_head.svg");
@@ -32,9 +32,14 @@ async function main() {
   await tx.wait();
 
   // mint
-  const toHex = (s: string) => parseInt(s, 16);
+  const hexToInt = (s: string) => parseInt(s, 16);
   tx = await contract.mint(
-    [toHex("ff00ff"), toHex("00ffff"), toHex("ffff00"), toHex("abcdef")],
+    [
+      hexToInt("ff00ff"),
+      hexToInt("00ffff"),
+      hexToInt("ffff00"),
+      hexToInt("abcdef"),
+    ],
     [false, true, false]
   );
   console.log("mint", tx.hash);
