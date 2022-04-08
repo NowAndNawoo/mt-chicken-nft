@@ -32,9 +32,14 @@ async function main() {
   await tx.wait();
 
   // mint
-  const toHex = (s: string) => parseInt(s, 16);
+  const hexToInt = (s: string) => parseInt(s, 16);
   tx = await contract.mint(
-    [toHex("ff00ff"), toHex("00ffff"), toHex("ffff00"), toHex("abcdef")],
+    [
+      hexToInt("ff00ff"),
+      hexToInt("00ffff"),
+      hexToInt("ffff00"),
+      hexToInt("abcdef"),
+    ],
     [false, true, false]
   );
   console.log("mint", tx.hash);
