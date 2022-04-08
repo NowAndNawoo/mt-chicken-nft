@@ -2,11 +2,11 @@ import { ethers } from "hardhat";
 import { readFileSync } from "fs";
 
 async function main() {
-  const factory = await ethers.getContractFactory("NurieNFT");
+  const factory = await ethers.getContractFactory("MtChickenNFT");
   const contract = await factory.deploy();
   await contract.deployed();
 
-  console.log("NurieNFT deployed to:", contract.address);
+  console.log("MtChickenNFT deployed to:", contract.address);
   const svgBody = readFileSync("./data/26kb.svg");
   console.log("svg.length", svgBody.length);
   const buf = svgBody.slice(0, 14000);
