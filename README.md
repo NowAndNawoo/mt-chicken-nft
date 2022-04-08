@@ -1,4 +1,4 @@
-# NurieNFT
+# MtChickenNFT
 
 ## Get started
 
