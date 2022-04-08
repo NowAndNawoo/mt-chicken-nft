@@ -103,7 +103,7 @@ contract MtChickenNFT is ERC721Enumerable, Ownable {
             );
     }
 
-    function toColorHex(uint24 value) private pure returns (string memory) {
+    function toHex(uint24 value) private pure returns (string memory) {
         bytes memory buffer = new bytes(6);
         for (uint256 i = 0; i < 6; i++) {
             buffer[i] = HEX_SYMBOLS[(value >> (4 * (5 - i))) & 0xf];
@@ -123,7 +123,7 @@ contract MtChickenNFT is ERC721Enumerable, Ownable {
                 ".",
                 colorClassNames[i],
                 "{fill:#",
-                toColorHex(paintInfo.colors[i]),
+                toHex(paintInfo.colors[i]),
                 ";}"
             );
         }
