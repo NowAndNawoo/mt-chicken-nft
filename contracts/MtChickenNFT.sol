@@ -12,8 +12,8 @@ struct PaintInfo {
 }
 
 struct Traits {
-    uint8 mountPower;
-    // ...
+    uint8 mount; // マウントカ (1-100)
+    uint8 thru; // スルーカ (1-100)
 }
 
 contract MtChickenNFT is ERC721Enumerable, Ownable {
@@ -47,8 +47,20 @@ contract MtChickenNFT is ERC721Enumerable, Ownable {
         uint256 _tokenId = nextTokenId;
         nextTokenId++;
         paintsData[_tokenId] = PaintInfo(colors, flags);
-        // TODO: set traitsData
+        traitsData[_tokenId] = getTraits(_tokenId);
         _safeMint(_msgSender(), _tokenId);
+    }
+
+    function getTraits(uint256 tokenId)
+        private
+        view
+        returns (Traits memory traits)
+    {
+        uint256 rand = uint256(
+            keccak256(abi.encodePacked(tokenId, block.timestamp))
+        );
+        traits.mount = uint8((rand % 100) + 1);
+        traits.thru = uint8(((rand / 100) % 100) + 1);
     }
 
     function setSvgHead(bytes calldata head) external onlyOwner {
@@ -88,7 +100,14 @@ contract MtChickenNFT is ERC721Enumerable, Ownable {
     }
 
     function getMetadata(uint256 tokenId) private view returns (bytes memory) {
-        // TODO: traitsDataからattributesを作成
+        Traits storage traits = traitsData[tokenId];
+        bytes memory attributes = abi.encodePacked(
+            '{"trait_type": "Mount", "value": ',
+            uint256(traits.mount).toString(),
+            '}, {"trait_type": "Thru", "value": ',
+            uint256(traits.thru).toString(),
+            "}"
+        );
         bytes
             memory description = 'Mt. Chicken is a NFT collection on the Polygon chain. You can \\"paint\\" Mt. Chicken through the website and mint it for only gas fee. No mint number limit, No secondary sale fee, No license(=CC0).';
         return
@@ -99,7 +118,9 @@ contract MtChickenNFT is ERC721Enumerable, Ownable {
                 description,
                 '", "image": "data:image/svg+xml;base64,',
                 Base64.encode(getSvg(paintsData[tokenId])),
-                '"}'
+                '", "attributes": [',
+                attributes,
+                "]}"
             );
     }
 
