@@ -47,6 +47,10 @@ describe("MtChickenNFT", function () {
       expect(await contract.name()).equal("MtChicken");
       expect(await contract.symbol()).equal("MTCHICKEN");
     });
+    it("frozenの初期値はfalse", async function () {
+      const { contract } = await loadFixture(fixture);
+      expect(await contract.frozen()).equal(false);
+    });
   });
   describe("mint", function () {
     it("mintできる", async function () {
@@ -122,6 +126,38 @@ describe("MtChickenNFT", function () {
       expect(style).string(".dsp-1{display:none;}");
       expect(style).not.string(".dsp-2{display:none;}");
       expect(style).string(".dsp-3{display:none;}");
+    });
+  });
+  describe("setSvg", function () {
+    it("owner以外は呼び出せない", async function () {
+      const { contractUser1 } = await loadFixture(fixture);
+      const err = "Ownable: caller is not the owner";
+      await expect(contractUser1.setSvgHead(Buffer.from("<svg>"))).revertedWith(
+        err
+      );
+      await expect(contractUser1.clearSvgBody()).revertedWith(err);
+      await expect(
+        contractUser1.appendSvgBody(Buffer.from("</svg>"))
+      ).revertedWith(err);
+      await expect(
+        contractUser1.setClassNames(
+          ["c1", "c2", "c3", "c4"],
+          ["f1", "f2", "f3"]
+        )
+      ).revertedWith(err);
+    });
+    it("freeze後はデータ変更できない", async function () {
+      const { contract } = await loadFixture(fixture);
+      await contract.freeze();
+      const err = "Data is frozen";
+      await expect(contract.setSvgHead(Buffer.from("<svg>"))).revertedWith(err);
+      await expect(contract.clearSvgBody()).revertedWith(err);
+      await expect(contract.appendSvgBody(Buffer.from("</svg>"))).revertedWith(
+        err
+      );
+      await expect(
+        contract.setClassNames(["c1", "c2", "c3", "c4"], ["f1", "f2", "f3"])
+      ).revertedWith(err);
     });
   });
 });
