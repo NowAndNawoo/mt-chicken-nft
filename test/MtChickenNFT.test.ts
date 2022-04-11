@@ -38,6 +38,7 @@ describe("MtChickenNFT", function () {
     );
     return { contract, contractUser1, contractUser2, owner, user1, user2 };
   }
+
   describe("basic", function () {
     it("deployできる", async function () {
       await loadFixture(fixture);
@@ -49,9 +50,10 @@ describe("MtChickenNFT", function () {
     });
     it("frozenの初期値はfalse", async function () {
       const { contract } = await loadFixture(fixture);
-      expect(await contract.frozen()).equal(false);
+      expect(await contract.frozen()).false;
     });
   });
+
   describe("mint", function () {
     it("mintできる", async function () {
       const { contract, contractUser1, contractUser2, user1, user2 } =
@@ -80,10 +82,11 @@ describe("MtChickenNFT", function () {
       ).revertedWith("flags.length is invalid");
     });
   });
+
   describe("metadata", function () {
     let metadata: any;
     beforeEach(async function () {
-      const { contract, contractUser1, owner, user1 } = await fixture();
+      const { contract, contractUser1 } = await fixture();
       await contractUser1.mint(
         [
           hexToInt("ff00ff"),
@@ -128,8 +131,9 @@ describe("MtChickenNFT", function () {
       expect(style).string(".dsp-3{display:none;}");
     });
   });
-  describe("setSvg", function () {
-    it("owner以外は呼び出せない", async function () {
+
+  describe("SVGデータ変更", function () {
+    it("ownerしかデータ変更できない", async function () {
       const { contractUser1 } = await loadFixture(fixture);
       const err = "Ownable: caller is not the owner";
       await expect(contractUser1.setSvgHead(Buffer.from("<svg>"))).revertedWith(
@@ -145,6 +149,16 @@ describe("MtChickenNFT", function () {
           ["f1", "f2", "f3"]
         )
       ).revertedWith(err);
+    });
+    it("ownerしかfreezeできない", async function () {
+      const { contractUser2 } = await loadFixture(fixture);
+      const err = "Ownable: caller is not the owner";
+      await expect(contractUser2.freeze()).revertedWith(err);
+    });
+    it("freeze後はfrozenがtrue", async function () {
+      const { contract } = await loadFixture(fixture);
+      await contract.freeze();
+      expect(await contract.frozen()).true;
     });
     it("freeze後はデータ変更できない", async function () {
       const { contract } = await loadFixture(fixture);
