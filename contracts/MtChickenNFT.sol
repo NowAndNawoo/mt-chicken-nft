@@ -28,11 +28,16 @@ contract MtChickenNFT is ERC721Enumerable, Ownable {
     mapping(uint256 => Traits) private traitsData; // tokenId => Traits
 
     uint256 public nextTokenId = 1;
+    bool public frozen = false;
 
     constructor() ERC721("MtChicken", "MTCHICKEN") {}
 
     function exists(uint256 tokenId) public view returns (bool) {
         return _exists(tokenId);
+    }
+
+    function freeze() external onlyOwner {
+        frozen = true;
     }
 
     function mint(uint24[] calldata colors, bool[] calldata flags) external {
@@ -64,14 +69,17 @@ contract MtChickenNFT is ERC721Enumerable, Ownable {
     }
 
     function setSvgHead(bytes calldata head) external onlyOwner {
+        require(!frozen, "Data is frozen");
         svgHead = head;
     }
 
     function appendSvgBody(bytes calldata body) external onlyOwner {
+        require(!frozen, "Data is frozen");
         svgBody = abi.encodePacked(svgBody, body);
     }
 
     function clearSvgBody() external onlyOwner {
+        require(!frozen, "Data is frozen");
         svgBody = "";
     }
 
@@ -79,6 +87,7 @@ contract MtChickenNFT is ERC721Enumerable, Ownable {
         string[] memory _colorClassNames,
         string[] memory _flagClassNames
     ) external onlyOwner {
+        require(!frozen, "Data is frozen");
         colorClassNames = _colorClassNames;
         flagClassNames = _flagClassNames;
     }
