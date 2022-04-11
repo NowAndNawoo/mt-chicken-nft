@@ -12,8 +12,8 @@ struct PaintInfo {
 }
 
 struct Traits {
-    uint8 mount; // マウントカ (1-100)
-    uint8 thru; // スルーカ (1-100)
+    uint8 mount;
+    uint8 thru;
 }
 
 contract MtChickenNFT is ERC721Enumerable, Ownable {
@@ -24,8 +24,8 @@ contract MtChickenNFT is ERC721Enumerable, Ownable {
     bytes private svgBody;
     string[] private colorClassNames;
     string[] private flagClassNames;
-    mapping(uint256 => PaintInfo) private paintsData; // tokenId => PaintInfo
-    mapping(uint256 => Traits) private traitsData; // tokenId => Traits
+    mapping(uint256 => PaintInfo) private paintsData;
+    mapping(uint256 => Traits) private traitsData;
 
     uint256 public nextTokenId = 1;
     bool public frozen = false;
