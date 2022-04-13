@@ -8,6 +8,5 @@ typechain
 cache
 artifacts
 
-/output/
 /input/
 /logs/
