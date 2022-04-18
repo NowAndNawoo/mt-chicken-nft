@@ -7,7 +7,7 @@ async function main() {
   await contract.deployed();
 
   console.log("MtChickenNFT deployed to:", contract.address);
-  const svgBody = readFileSync("./data/26kb.svg");
+  const svgBody = readFileSync("./data/chicken_body.svg");
   console.log("svg.length", svgBody.length);
   const buf = svgBody.slice(0, 14000);
   console.log("buf.length", buf.length);

@@ -10,5 +10,5 @@ cd mt-chicken-nft
 npm install
 cp .env.example .env
 # .envの内容を書き換える
-npx hardhat run scripts/MtChickenNFT/deploy.ts
+npx hardhat run scripts/deploy.ts
 ```

@@ -57,7 +57,7 @@ describe("MtChickenNFT", function () {
   describe("mint", function () {
     it("mintできる", async function () {
       const { contract, contractUser1, contractUser2, user1, user2 } =
-        await fixture();
+        await loadFixture(fixture);
       await contractUser1.mint([1, 1, 1, 1], [true, true, true]);
       await contractUser2.mint([2, 2, 2, 2], [false, false, false]);
       expect(await contract.totalSupply()).equal(2);
@@ -65,7 +65,7 @@ describe("MtChickenNFT", function () {
       expect(await contract.ownerOf(2)).equal(user2.address);
     });
     it("mintしていないtokenURIは取得できない", async function () {
-      const { contractUser1 } = await fixture();
+      const { contractUser1 } = await loadFixture(fixture);
       await contractUser1.mint([1, 2, 3, 4], [false, false, true]);
       await expect(contractUser1.tokenURI(1)).not.reverted;
       await expect(contractUser1.tokenURI(2)).revertedWith(
@@ -73,7 +73,7 @@ describe("MtChickenNFT", function () {
       );
     });
     it("引数の数が違うとmintできない", async function () {
-      const { contractUser2 } = await fixture();
+      const { contractUser2 } = await loadFixture(fixture);
       await expect(
         contractUser2.mint([1, 2, 3, 4, 5], [false, true, false])
       ).revertedWith("colors.length is invalid");
@@ -86,7 +86,7 @@ describe("MtChickenNFT", function () {
   describe("metadata", function () {
     let metadata: any;
     beforeEach(async function () {
-      const { contract, contractUser1 } = await fixture();
+      const { contract, contractUser1 } = await loadFixture(fixture);
       await contractUser1.mint(
         [
           hexToInt("ff00ff"),
