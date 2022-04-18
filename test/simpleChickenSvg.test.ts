@@ -23,8 +23,8 @@ describe("MtChickenNFT", function () {
     const contractUser1 = contract.connect(user1);
     const contractUser2 = contract.connect(user2);
 
-    const svgHead = readFileSync("./data/simple/chicken_head.svg");
-    const svgBody = readFileSync("./data/simple/chicken_body.svg");
+    const svgHead = readFileSync("./data/chicken_head.svg");
+    const svgBody = readFileSync("./data/chicken_body.svg");
     const splitSize = 12000;
     const splitCount = Math.ceil(svgBody.length / splitSize);
     await contract.setSvgHead(svgHead);
@@ -47,7 +47,7 @@ describe("MtChickenNFT", function () {
         "beak",
         "foot",
       ],
-      ["forehead", "nose", "cheek1", "berry1"]
+      ["forehead", "nose", "cheek", "berry"]
     );
     return { contract, contractUser1, contractUser2, owner, user1, user2 };
   }
@@ -113,8 +113,8 @@ describe("MtChickenNFT", function () {
       expect(style).string(".foot{fill:#121212;}");
       expect(style).string(".forehead{display:none;}");
       expect(style).not.string(".nose{display:none;}");
-      expect(style).string(".cheek1{display:none;}");
-      expect(style).not.string(".berry1{display:none;}");
+      expect(style).string(".cheek{display:none;}");
+      expect(style).not.string(".berry{display:none;}");
     });
   });
 });
