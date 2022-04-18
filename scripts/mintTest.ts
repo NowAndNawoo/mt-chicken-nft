@@ -1,7 +1,8 @@
 import { ethers } from "hardhat";
 import { writeFileSync } from "fs";
 
-const CONTRACT_ADDRESS = "0x5FbDB2315678afecb367f032d93F642f64180aa3"; // local
+//const CONTRACT_ADDRESS = "0x5FbDB2315678afecb367f032d93F642f64180aa3"; // local
+const CONTRACT_ADDRESS = "0x865CcBfe3CAC3cE0834C006c2581C08fd5Ebc468"; // mumbai
 
 async function main() {
   // contract
