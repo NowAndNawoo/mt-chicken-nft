@@ -39,37 +39,41 @@ async function main() {
       "beak",
       "foot",
     ],
-    ["cheeks", "belly"]
+    ["forehead", "nose", "cheek1", "berry1"]
   );
 
   console.log("setClassNames", tx.hash);
   await tx.wait();
 
   // mint
-  // const hexToInt = (s: string) => parseInt(s, 16);
-  // tx = await contract.mint(
-  //   [
-  //     hexToInt("ff00ff"),
-  //     hexToInt("00ffff"),
-  //     hexToInt("ffff00"),
-  //     hexToInt("abcdef"),
-  //   ],
-  //   [false, true, false]
-  // );
-  // console.log("mint", tx.hash);
-  // await tx.wait();
+  const hexToInt = (s: string) => parseInt(s, 16);
+  const randomColors = (count: number) =>
+    [...Array(count)].map((_) => Math.floor(Math.random() * 0xffffff));
+  console.log(randomColors);
+  tx = await contract.mint(
+    randomColors(12),
+    // [
+    //   hexToInt("ff00ff"),
+    //   hexToInt("00ffff"),
+    //   hexToInt("ffff00"),
+    //   hexToInt("abcdef"),
+    // ],
+    [false, true, false, true]
+  );
+  console.log("mint", tx.hash);
+  await tx.wait();
 
-  // // SVGの確認
-  // const tokenId = 1;
-  // const uri = await contract.tokenURI(tokenId);
-  // const json = Buffer.from(uri.split(",")[1], "base64").toString();
-  // console.log(uri);
-  // const svg = Buffer.from(
-  //   JSON.parse(json).image.split(",")[1],
-  //   "base64"
-  // ).toString();
-  // console.log(svg);
-  // writeFileSync(`./output/sample_${tokenId}.svg`, svg);
+  // SVGの確認
+  const tokenId = 1;
+  const uri = await contract.tokenURI(tokenId);
+  const json = Buffer.from(uri.split(",")[1], "base64").toString();
+  console.log(uri);
+  const svg = Buffer.from(
+    JSON.parse(json).image.split(",")[1],
+    "base64"
+  ).toString();
+  console.log(svg);
+  writeFileSync(`./output/chicken_${tokenId}.svg`, svg);
 }
 
 main().catch((error) => {
