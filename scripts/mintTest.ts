@@ -5,23 +5,22 @@ import { writeFileSync } from "fs";
 const CONTRACT_ADDRESS = "0x865CcBfe3CAC3cE0834C006c2581C08fd5Ebc468"; // mumbai
 
 async function main() {
-  // contract
   const factory = await ethers.getContractFactory("MtChickenNFT");
   const contract = factory.attach(CONTRACT_ADDRESS);
   console.log("MtChickenNFT attached to:", contract.address);
 
-  // mint
+  // ランダム色で6枚ミントする
   const flagsList = [
-    [false, false, false, false],
-    [true, false, false, false],
-    [false, true, false, false],
-    [false, false, true, false],
-    [false, false, false, true],
-    [true, true, true, true],
+    [false, false, false, false], // 傷なし
+    [true, false, false, false], // 額の傷のみ
+    [false, true, false, false], // 鼻ヒゲのみ
+    [false, false, true, false], // 頬の傷のみ
+    [false, false, false, true], // 腹の傷のみ
+    [true, true, true, true], // 全部入り
   ];
   for (let i = 0; i < flagsList.length; i++) {
     const colors = [...Array(12)].map((_) =>
-      Math.floor(Math.random() * 0xffffff)
+      Math.floor(Math.random() * (0xffffff + 1))
     );
     let tx = await contract.mint(colors, flagsList[i]);
     console.log("mint", i, tx.hash);
