@@ -7,6 +7,7 @@ async function main() {
   const contract = await factory.deploy();
   await contract.deployed();
   console.log("MtChickenNFT deployed to:", contract.address);
+
   // setSvgHead & appendSvgBody
   const svgHead = readFileSync("./data/chicken_head.svg");
   const svgBody = readFileSync("./data/chicken_body.svg");
@@ -41,6 +42,28 @@ async function main() {
     ["forehead", "nose", "cheek", "berry"]
   );
   console.log("setClassNames", tx.hash);
+  await tx.wait();
+
+  // 1枚目をミント (色なしバージョン)
+  const hexToInt = (s: string) => parseInt(s, 16);
+  tx = await contract.mint(
+    [
+      hexToInt("999999"),
+      hexToInt("b3b3b3"),
+      hexToInt("999999"),
+      hexToInt("ffffff"),
+      hexToInt("cccccc"),
+      hexToInt("e6e6e6"),
+      hexToInt("b3b3b3"),
+      hexToInt("ffffff"),
+      hexToInt("cccccc"),
+      hexToInt("b3b3b3"),
+      hexToInt("cccccc"),
+      hexToInt("cccccc"),
+    ],
+    [false, false, false, false]
+  );
+  console.log("mint#1", tx.hash);
   await tx.wait();
 }
 
