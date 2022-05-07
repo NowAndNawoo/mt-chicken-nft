@@ -26,3 +26,13 @@ npx hardhat run scripts/deploy.ts --network polygon
 - 1 枚目のミント(色なしバージョン)
 
 を行います。
+
+`MtChickenNFT deployed to:` の後に表示されるのがコントラクトアドレスです。
+
+## Verify
+
+.env に POLYGONSCAN_API_KEY が設定されていることを確認してください。
+
+```sh
+npx hardhat verify --network polygon <コントラクトアドレス>
+```
